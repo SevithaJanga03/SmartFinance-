@@ -1,0 +1,430 @@
+/* GLOBAL RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0f172a; /* dark background */
+    color: #e2e8f0; /* light text */
+}
+
+/* AUTH FORMS */
+.page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #0f172a;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    background-color: #1e293b;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 26px;
+    color: #f8fafc;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.form-container input:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+.form-container button {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #2563eb;
+}
+
+.auth-switch-link {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+.auth-switch-link a {
+    color: #60a5fa;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-switch-link a:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+/* APP LAYOUT */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: #0f172a;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background-color: #1e293b;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    border-right: 1px solid #334155;
+}
+
+.nav-links button {
+    background: none;
+    border: none;
+    padding: 1rem 1.2rem;
+    margin-bottom: 12px;
+    color: #e2e8f0;
+    font-family: 'Inter', 'Segoe UI', sans-serif; /* 👈 updated font */
+    font-size: 16px; /* 👈 larger font size */
+    font-weight: 600;
+    text-align: left;
+    width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    letter-spacing: 0.3px;
+}
+
+.nav-links button:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+.add-nav-button {
+    background-color: #10b981; /* emerald green */
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem 1.2rem;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-nav-button:hover {
+    background-color: #059669;
+}
+
+
+.add-button {
+    margin-top: auto;
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+}
+
+.add-button:hover {
+    background-color: #2563eb;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 0.8rem 2rem;
+    border-bottom: 1px solid #334155;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+}
+
+.navbar-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar-user {
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+.logout-button {
+    padding: 6px 12px;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.logout-button:hover {
+    background-color: #dc2626;
+}
+
+/* DASHBOARD */
+.dashboard-container {
+    padding: 2rem;
+    color: #e2e8f0;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-stats-grid {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    flex: 1;
+    background: #1e293b;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.stat-card.blue { color: #60a5fa; }
+.stat-card.green { color: #4ade80; }
+.stat-card.red { color: #f87171; }
+
+.stat-label {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* CHARTS */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.chart-card {
+    background: #1e293b;
+    height: 240px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.chart-card.full-width {
+    grid-column: span 2;
+    height: 300px;
+}
+
+/* Common sidebar link */
+.sidebar-link {
+    display: block;
+    background: none;
+    text-decoration: none;
+    padding: 1rem 1.2rem;
+    margin-bottom: 10px;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+/* ✅ Highlight active route */
+.sidebar-link.active {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+/* ✅ Unique Add Button */
+.add-button-link {
+    background-color: #10b981;
+    color: white;
+    font-weight: bold;
+    margin-top: 1.5rem;
+}
+
+.add-button-link:hover {
+    background-color: #059669;
+}
+
+/* === Add Transaction Form (Dark Mode) === */
+
+.transaction-form-container {
+    max-width: 480px;
+    margin: 3rem auto;
+    background-color: #1e293b; /* slate dark */
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    color: #f8fafc;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.transaction-form-container h2 {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 1.8rem;
+    color: #ffffff;
+}
+
+/* === Toggle Income / Expense === */
+.transaction-toggle {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.transaction-toggle button {
+    flex: 1;
+    padding: 0.9rem 1rem;
+    background-color: #334155;
+    color: #cbd5e1;
+    font-weight: 600;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.transaction-toggle button:hover {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+.transaction-toggle .active {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+/* === Form Fields === */
+.transaction-form input,
+.transaction-form textarea,
+.transaction-form select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.transaction-form input::placeholder,
+.transaction-form textarea::placeholder {
+    color: #94a3b8;
+}
+
+.transaction-form input:focus,
+.transaction-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* === Submit Button === */
+.transaction-form button {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    background-color: #3b82f6;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.transaction-form button:hover {
+    background-color: #2563eb;
+}
+
+/* === Message Feedback === */
+.form-message {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 1rem;
+    color: #facc15; /* yellowish for status messages */
+}
+

@@ -15,6 +15,7 @@ const AccountsPage = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
 
+
     const [editAccountId, setEditAccountId] = useState(null);
     const [editFormData, setEditFormData] = useState({
         name: "",

@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.time.LocalDate;   // ✅ Import LocalDate
 import java.util.List;
 
 @RestController
@@ -41,12 +44,15 @@ public class TransactionController {
         Account account = accountRepository.findById(dto.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
+        // Convert String date to LocalDate
+        LocalDate parsedDate = LocalDate.parse(dto.getDate());  // ✅ Fix
+
         // Create and save transaction
         Transaction transaction = new Transaction();
         transaction.setAmount(dto.getAmount());
         transaction.setCategory(dto.getCategory());
         transaction.setDescription(dto.getDescription());
-        transaction.setDate(dto.getDate());
+        transaction.setDate(parsedDate);  // ✅ Use LocalDate
         transaction.setType(dto.getType());
         transaction.setUser(user);
         transaction.setAccount(account);
@@ -56,7 +62,6 @@ public class TransactionController {
         return ResponseEntity.ok("Transaction saved successfully!");
     }
 
-
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> getTransactions(@RequestHeader("Authorization") String authHeader) {
         String username = jwtUtil.extractUsername(authHeader.substring(7));
@@ -65,23 +70,21 @@ public class TransactionController {
 
         List<Transaction> transactions = transactionRepository.findByUser(user);
 
-        // Map Transaction entities to DTOs
         List<TransactionDTO> dtoList = transactions.stream().map(t -> {
             TransactionDTO dto = new TransactionDTO();
             dto.setId(t.getId());
             dto.setAmount(t.getAmount());
             dto.setCategory(t.getCategory());
             dto.setDescription(t.getDescription());
-            dto.setDate(t.getDate());
+            dto.setDate(t.getDate().toString());   // ✅ Send as String
             dto.setType(t.getType());
             dto.setAccountId(t.getAccount() != null ? t.getAccount().getId() : null);
-            dto.setAccountName(t.getAccount() != null ? t.getAccount().getName() : ""); // 👈 New!
+            dto.setAccountName(t.getAccount() != null ? t.getAccount().getName() : "");
             return dto;
         }).toList();
 
         return ResponseEntity.ok(dtoList);
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long id,
@@ -116,21 +119,29 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update this transaction.");
         }
 
-        // Fetch new account (if provided)
         if (dto.getAccountId() != null) {
             Account account = accountRepository.findById(dto.getAccountId())
                     .orElseThrow(() -> new RuntimeException("Account not found"));
             transaction.setAccount(account);
         }
 
-        // Update transaction fields
+        // Convert String date to LocalDate
+        LocalDate parsedDate = LocalDate.parse(dto.getDate());  // ✅ Fix
+
         transaction.setAmount(dto.getAmount());
         transaction.setCategory(dto.getCategory());
         transaction.setDescription(dto.getDescription());
-        transaction.setDate(dto.getDate());
+        transaction.setDate(parsedDate);   // ✅ Use LocalDate
         transaction.setType(dto.getType());
 
         transactionRepository.save(transaction);
         return ResponseEntity.ok("Transaction updated successfully!");
+    }
+
+    @GetMapping("/categories")
+    public List<String> getDistinctCategories(Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return transactionRepository.findDistinctCategoriesByUser(user);
     }
 }

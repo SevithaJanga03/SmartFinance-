@@ -33,7 +33,7 @@ const AppLayout = () => {
                 <header className="navbar">
                     <div className="navbar-left">
                         <img src={logo} alt="SmartFinance Logo" className="navbar-logo" />
-                        <span className="navbar-title">SmartFinance</span>
+                        <span className="navbar-title">Smart Finance</span>
                     </div>
                     <div className="navbar-right">
                         {user && <span className="navbar-user">Hi, {user.name}</span>}

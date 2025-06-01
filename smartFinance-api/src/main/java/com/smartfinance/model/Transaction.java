@@ -2,6 +2,8 @@ package com.smartfinance.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class Transaction {
 
@@ -12,7 +14,10 @@ public class Transaction {
     private Double amount;
     private String category;
     private String description;
-    private String date; // Or LocalDate if you prefer
+
+    @Column(name = "date", columnDefinition = "DATE")  // Optional but explicit
+    private LocalDate date; // Or LocalDate if you prefer
+
     private String type;
 
     @ManyToOne
@@ -56,11 +61,11 @@ public class Transaction {
         this.description = description;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

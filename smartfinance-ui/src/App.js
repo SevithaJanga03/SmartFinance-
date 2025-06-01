@@ -6,6 +6,7 @@ import AddTransactionPage from './pages/AddTransactionPage';
 import AppLayout from './pages/AppLayout';
 import TransactionsPage from "./pages/TransactionsPage";
 import AccountsPage from "./pages/AccountsPage";
+import Budgets from "./pages/Budgets";
 
 const App = () => {
     const token = localStorage.getItem('token');
@@ -25,6 +26,8 @@ const App = () => {
                         <Route path="add-transaction" element={<AddTransactionPage/>}/>
                         <Route path="transactions" element={<TransactionsPage />} />
                         <Route path="accounts" element={<AccountsPage />} />
+                        <Route path="/budgets" element={<Budgets />} />
+
 
                         {/* Add future routes here (transactions, accounts, reports, etc.) */}
                     </Route>

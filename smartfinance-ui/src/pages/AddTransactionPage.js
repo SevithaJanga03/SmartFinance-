@@ -1,16 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Styles.css";
 
 const AddTransactionPage = () => {
     const [type, setType] = useState("INCOME");
+    const [accounts, setAccounts] = useState([]);
     const [formData, setFormData] = useState({
         amount: "",
         category: "",
         description: "",
-        date: ""
+        date: "",
+        accountId: "" // ➡️ New field for selected account
     });
     const [message, setMessage] = useState("");
+
+    // ➡️ Fetch accounts when the component mounts
+    useEffect(() => {
+        const fetchAccounts = async () => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const token = user?.token;
+
+            if (!token) return;
+
+            try {
+                const res = await axios.get("http://localhost:8080/api/accounts", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setAccounts(res.data);
+            } catch (err) {
+                console.error("Error fetching accounts:", err);
+            }
+        };
+
+        fetchAccounts();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({
@@ -29,6 +54,11 @@ const AddTransactionPage = () => {
             return;
         }
 
+        if (!formData.accountId) {
+            setMessage("Please select an account");
+            return;
+        }
+
         try {
             const payload = { ...formData, type };
             await axios.post("http://localhost:8080/api/transactions", payload, {
@@ -37,7 +67,13 @@ const AddTransactionPage = () => {
                 }
             });
             setMessage("✅ Transaction added successfully!");
-            setFormData({ amount: "", category: "", description: "", date: "" });
+            setFormData({
+                amount: "",
+                category: "",
+                description: "",
+                date: "",
+                accountId: ""
+            });
         } catch (err) {
             console.error("Error adding transaction:", err);
             setMessage("❌ Failed to add transaction.");
@@ -71,6 +107,21 @@ const AddTransactionPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="transaction-form">
+                {/* ➡️ Account select */}
+                <select
+                    name="accountId"
+                    value={formData.accountId}
+                    onChange={handleChange}
+                    required
+                >
+                    <option value="">Select Account</option>
+                    {accounts.map((acc) => (
+                        <option key={acc.id} value={acc.id}>
+                            {acc.name} ({acc.type})
+                        </option>
+                    ))}
+                </select>
+
                 <input
                     type="number"
                     name="amount"

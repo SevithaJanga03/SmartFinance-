@@ -59,7 +59,7 @@ const UserDashboard = () => {
             },
             {
                 label: "Expenses",
-                data: Object.values(lastSixMonths).map((month) => month.expenses || 0),
+                data: Object.values(lastSixMonths).map((month) => month.expense || 0),
                 backgroundColor: "#ef4444",
             },
         ],
@@ -67,7 +67,7 @@ const UserDashboard = () => {
 
     return (
         <>
-            <h1 className="page-title">Dashboard</h1>
+            <h1>Dashboard</h1>
 
             <div className="dashboard-stats-grid">
                 <StatCard label="Total Balance" value={summary.balance} color="blue" />
@@ -96,7 +96,7 @@ const UserDashboard = () => {
 const StatCard = ({ label, value, color }) => (
     <div className={`stat-card ${color}`}>
         <p className="stat-label">{label}</p>
-        <p className="stat-value">₹{value.toLocaleString()}</p>
+        <p className="stat-value">${value.toLocaleString()}</p>
     </div>
 );
 

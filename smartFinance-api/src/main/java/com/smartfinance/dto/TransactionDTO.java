@@ -1,11 +1,14 @@
 package com.smartfinance.dto;
 
 public class TransactionDTO {
+    private Long id;
     private Double amount;
     private String category;
     private String description;
     private String date;
     private String type;
+    private Long accountId; // 💡 New field to link to Account
+    private String accountName;
 
     // Getters and Setters
     public Double getAmount() {
@@ -38,4 +41,21 @@ public class TransactionDTO {
     public void setType(String type) {
         this.type = type;
     }
+
+    // 👇 Getter and Setter for accountId
+    public Long getAccountId() {
+        return accountId;
+    }
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+    public String getAccountName() {
+        return accountName;
+    }
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 }

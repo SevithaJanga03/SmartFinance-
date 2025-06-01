@@ -31,4 +31,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "ORDER BY MIN(STR_TO_DATE(t.date, '%Y-%m-%d')) DESC", nativeQuery = true)
     List<Object[]> getMonthlyTotals(@Param("userId") Long userId);
 
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.account.id = :accountId AND t.type = 'INCOME'")
+    Double getTotalIncomeForAccount(@Param("accountId") Long accountId);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.account.id = :accountId AND t.type = 'EXPENSE'")
+    Double getTotalExpensesForAccount(@Param("accountId") Long accountId);
+
+
 }

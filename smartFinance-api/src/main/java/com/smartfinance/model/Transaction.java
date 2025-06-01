@@ -18,6 +18,10 @@ public class Transaction {
     @ManyToOne
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     // Add getters and setters for all fields!
 
     public Long getId() {
@@ -74,5 +78,14 @@ public class Transaction {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    // Getter and Setter
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

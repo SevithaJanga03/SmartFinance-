@@ -57,19 +57,32 @@ public class BudgetController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Budget> budgets = budgetRepository.findByUser(user);
+
         BigDecimal totalBudget = BigDecimal.ZERO;
         BigDecimal totalUsed = BigDecimal.ZERO;
 
         for (Budget budget : budgets) {
-            totalBudget = totalBudget.add(budget.getBudgetLimit());
-            if (budget.getExpenses() != null) {
-                totalUsed = totalUsed.add(budget.getExpenses());
+            // Add to total budget
+            totalBudget = totalBudget.add(budget.getBudgetLimit() != null ? budget.getBudgetLimit() : BigDecimal.ZERO);
+
+            // Sum actual expenses for this category and date range
+            BigDecimal used = transactionRepository.sumExpensesForCategoryAndDateRange(
+                    user,
+                    budget.getCategory(),
+                    budget.getStartDate(),
+                    budget.getEndDate()
+            );
+
+            if (used != null) {
+                totalUsed = totalUsed.add(used);
             }
         }
 
         BigDecimal totalLeft = totalBudget.subtract(totalUsed);
+
         return new BudgetSummary(totalBudget, totalUsed, totalLeft);
     }
+
 
     // ✅ Update Budget
     @PutMapping("/{id}")

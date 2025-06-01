@@ -7,6 +7,7 @@ import AppLayout from './pages/AppLayout';
 import TransactionsPage from "./pages/TransactionsPage";
 import AccountsPage from "./pages/AccountsPage";
 import Budgets from "./pages/Budgets";
+import ReportsPage from "./pages/ReportsPage";
 
 const App = () => {
     const token = localStorage.getItem('token');
@@ -27,6 +28,8 @@ const App = () => {
                         <Route path="transactions" element={<TransactionsPage />} />
                         <Route path="accounts" element={<AccountsPage />} />
                         <Route path="/budgets" element={<Budgets />} />
+                        <Route path="/reports" element={<ReportsPage/>}/>
+
 
 
                         {/* Add future routes here (transactions, accounts, reports, etc.) */}

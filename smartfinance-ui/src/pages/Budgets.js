@@ -26,7 +26,6 @@ const BudgetsPage = () => {
     useEffect(() => {
         fetchBudgets();
         fetchBudgetSummary();
-
     }, []);
 
     const fetchBudgets = async () => {
@@ -35,13 +34,11 @@ const BudgetsPage = () => {
             const res = await axios.get("http://localhost:8080/api/budgets/with-expenses", {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log("data",res.data);
             setBudgets(res.data);
         } catch (err) {
             console.error("Error fetching budgets:", err);
         }
     };
-
 
     const fetchBudgetSummary = async () => {
         if (!token) return;
@@ -91,11 +88,9 @@ const BudgetsPage = () => {
             return;
         }
         try {
-            await axios.put(
-                `http://localhost:8080/api/budgets/${editBudget.id}`,
-                editBudget,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axios.put(`http://localhost:8080/api/budgets/${editBudget.id}`, editBudget, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             alert("Budget updated!");
             setShowEditModal(false);
             fetchBudgets();
@@ -155,34 +150,70 @@ const BudgetsPage = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {budgets.map((budget) => (
-                        <tr key={budget.id}>
-                            <td>{budget.category}</td>
-                            <td>$ {budget.budgetLimit}</td>
-                            <td>$ {budget.used || 0}</td>
-                            <td
-                                className={
-                                    budget.budgetLimit - (budget.used || 0) >= 0 ? "green" : "red"
-                                }
-                            >
-                                $ {budget.budgetLimit - (budget.used || 0)}
-                            </td>
-                            <td>
-                                <button
-                                    className="edit-btn"
-                                    onClick={() => handleEditBudget(budget)}
+                    {budgets.map((budget) => {
+                        const percentUsed =
+                            budget.budgetLimit > 0 ? (budget.used / budget.budgetLimit) * 100 : 0;
+                        return (
+                            <tr key={budget.id}>
+                                <td>{budget.category}</td>
+                                <td>$ {budget.budgetLimit}</td>
+                                <td style={{ width: "30%" }}>
+                                    <div
+                                        style={{
+                                            backgroundColor: "#e0e0df",
+                                            borderRadius: "10px",
+                                            height: "20px",
+                                            width: "100%",
+                                            position: "relative",
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                backgroundColor: budget.budgetLimit - (budget.used || 0) >= 0 ? "#76c7c0" : "red",
+                                                width: `${
+                                                    Math.min(100, (budget.used / budget.budgetLimit) * 100)
+                                                }%`,
+                                                height: "100%",
+                                                borderRadius: "10px",
+                                                transition: "width 0.5s",
+                                            }}
+                                        >
+      <span
+          style={{
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              color: "white",
+              fontSize: "0.8rem",
+          }}
+      >
+        ${budget.used}
+      </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td
+                                    className={
+                                        budget.budgetLimit - (budget.used || 0) >= 0 ? "green" : "red"
+                                    }
                                 >
-                                    Edit
-                                </button>
-                                <button
-                                    className="delete-btn"
-                                    onClick={() => handleDeleteBudget(budget.id)}
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                                    $ {budget.budgetLimit - (budget.used || 0)}
+                                </td>
+                                <td>
+                                    <button className="edit-btn" onClick={() => handleEditBudget(budget)}>
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDeleteBudget(budget.id)}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        );
+                    })}
                     </tbody>
                 </table>
             </div>
@@ -195,9 +226,7 @@ const BudgetsPage = () => {
                         <select
                             name="category"
                             value={newBudget.category}
-                            onChange={(e) =>
-                                setNewBudget({ ...newBudget, category: e.target.value })
-                            }
+                            onChange={(e) => setNewBudget({ ...newBudget, category: e.target.value })}
                         >
                             <option value="">Select Category</option>
                             <option value="Rent">Rent</option>
@@ -214,34 +243,25 @@ const BudgetsPage = () => {
                             placeholder="Budget Limit"
                             name="budgetLimit"
                             value={newBudget.budgetLimit}
-                            onChange={(e) =>
-                                setNewBudget({ ...newBudget, budgetLimit: e.target.value })
-                            }
+                            onChange={(e) => setNewBudget({ ...newBudget, budgetLimit: e.target.value })}
                         />
                         <input
                             type="date"
                             name="startDate"
                             value={newBudget.startDate}
-                            onChange={(e) =>
-                                setNewBudget({ ...newBudget, startDate: e.target.value })
-                            }
+                            onChange={(e) => setNewBudget({ ...newBudget, startDate: e.target.value })}
                         />
                         <input
                             type="date"
                             name="endDate"
                             value={newBudget.endDate}
-                            onChange={(e) =>
-                                setNewBudget({ ...newBudget, endDate: e.target.value })
-                            }
+                            onChange={(e) => setNewBudget({ ...newBudget, endDate: e.target.value })}
                         />
                         <div className="modal-buttons">
                             <button className="save-btn" onClick={handleAddBudget}>
                                 Save
                             </button>
-                            <button
-                                className="cancel-btn"
-                                onClick={() => setShowModal(false)}
-                            >
+                            <button className="cancel-btn" onClick={() => setShowModal(false)}>
                                 Cancel
                             </button>
                         </div>
@@ -271,7 +291,6 @@ const BudgetsPage = () => {
                             <option value="Healthcare">Healthcare</option>
                             <option value="Other Expense">Other Expense</option>
                         </select>
-
 
                         <input
                             type="number"

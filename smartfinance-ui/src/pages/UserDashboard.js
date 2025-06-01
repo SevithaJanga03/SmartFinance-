@@ -71,8 +71,8 @@ const UserDashboard = () => {
 
             <div className="dashboard-stats-grid">
                 <StatCard label="Total Balance" value={summary.balance} color="blue" />
-                <StatCard label="This Month Income" value={summary.income} color="green" />
-                <StatCard label="This Month Expenses" value={summary.expenses} color="red" />
+                <StatCard label="Total Income" value={summary.income} color="green" />
+                <StatCard label="Total Expenses" value={summary.expenses} color="red" />
             </div>
 
             <div className="charts-grid">

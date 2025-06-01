@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByUser(User user);
@@ -47,6 +48,40 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                                   @Param("category") String category,
                                                   @Param("startDate") LocalDate startDate,
                                                   @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT DISTINCT FUNCTION('DATE_FORMAT', t.date, '%Y-%m') FROM Transaction t WHERE t.user.id = :userId")
+    List<String> findDistinctMonths(@Param("userId") Long userId);
+
+    @Query("SELECT new map(t.category as category, SUM(t.amount) as amount) " +
+            "FROM Transaction t WHERE t.user.id = :userId AND FUNCTION('DATE_FORMAT', t.date, '%Y-%m') = :month AND t.type = :type " +
+            "GROUP BY t.category")
+    List<Map<String, Object>> sumByCategory(@Param("userId") Long userId, @Param("month") String month, @Param("type") String type);
+
+    @Query("SELECT new map(FUNCTION('DATE_FORMAT', t.date, '%Y-%m') as month, " +
+            "SUM(CASE WHEN t.type='INCOME' THEN t.amount ELSE 0 END) as income, " +
+            "SUM(CASE WHEN t.type='EXPENSE' THEN t.amount ELSE 0 END) as expense) " +
+            "FROM Transaction t WHERE t.user.id = :userId GROUP BY month ORDER BY month")
+    List<Map<String, Object>> getMonthlyBalanceTrend(@Param("userId") Long userId);
+
+    @Query("SELECT new map(t.category as category, SUM(t.amount) as amount) " +
+            "FROM Transaction t WHERE t.user.id = :userId AND FUNCTION('DATE_FORMAT', t.date, '%Y-%m') = :month AND t.type='EXPENSE' " +
+            "GROUP BY t.category ORDER BY amount DESC")
+    List<Map<String, Object>> getTopExpenses(@Param("userId") Long userId, @Param("month") String month);
+
+    @Query("SELECT new map(FUNCTION('DATE_FORMAT', t.date, '%Y-%m') as month, " +
+            "(SUM(CASE WHEN t.type='INCOME' THEN t.amount ELSE 0 END) - SUM(CASE WHEN t.type='EXPENSE' THEN t.amount ELSE 0 END)) / SUM(CASE WHEN t.type='INCOME' THEN t.amount ELSE 0 END) * 100 as savingsRate) " +
+            "FROM Transaction t WHERE t.user.id = :userId GROUP BY month ORDER BY month")
+    List<Map<String, Object>> getSavingsRate(@Param("userId") Long userId);
+
+    @Query("SELECT new map(FUNCTION('DATE_FORMAT', t.date, '%Y-%m') as month, " +
+            "SUM(CASE WHEN t.type='INCOME' THEN t.amount ELSE -t.amount END) as netWorth) " +
+            "FROM Transaction t WHERE t.user.id = :userId GROUP BY month ORDER BY month")
+    List<Map<String, Object>> getNetWorth(@Param("userId") Long userId);
+
+    List<Transaction> findByUserAndDateBetween(User user, LocalDate start, LocalDate end);
+
+        @Query("SELECT t FROM Transaction t WHERE t.user = :user AND t.type = :type AND FUNCTION('DATE_FORMAT', t.date, '%Y-%m') = :month")
+    List<Transaction> findByUserAndTypeAndMonth(@Param("user") User user, @Param("type") String type, @Param("month") String month);
 
 
 

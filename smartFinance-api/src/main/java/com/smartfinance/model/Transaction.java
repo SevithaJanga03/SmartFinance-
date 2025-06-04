@@ -27,7 +27,14 @@ public class Transaction {
     @JoinColumn(name = "account_id")
     private Account account;
 
+    @ManyToOne
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
+
     // Add getters and setters for all fields!
+
+    public Goal getGoal() { return goal; }
+    public void setGoal(Goal goal) { this.goal = goal; }
 
     public Long getId() {
         return id;

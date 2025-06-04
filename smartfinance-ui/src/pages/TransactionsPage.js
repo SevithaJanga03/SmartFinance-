@@ -176,6 +176,7 @@ const TransactionsPage = () => {
                     <option value="Transport">Transport</option>
                     <option value="Entertainment">Entertainment</option>
                     <option value="Healthcare">Healthcare</option>
+                    <option value="Goals">Goals</option>
                     <option value="Other Income">Other Income</option>
                     <option value="Other Expense">Other Expense</option>
                 </select>
@@ -260,7 +261,8 @@ const TransactionsPage = () => {
                                         <option value="Transport">Transport</option>
                                         <option value="Entertainment">Entertainment</option>
                                         <option value="Healthcare">Healthcare</option>
-                                        <option value="Other Income">Other Income</option>
+                                        <option value="Goals">Goals</option>
+                                        <option value="Other   Income">Other Income</option>
                                         <option value="Other Expense">Other Expense</option>
                                     </select>
                                 </td>

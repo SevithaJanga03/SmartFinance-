@@ -144,3 +144,22 @@
 .red {
     color: #ef4444;
 }
+.goal-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.goal-form input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #1c2a3e;
+    color: #d1d5db;
+}
+
+.goal-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}

@@ -9,8 +9,16 @@ public class TransactionDTO {
     private String type;
     private Long accountId; // 💡 New field to link to Account
     private String accountName;
+    private Long goalId;
+
+
 
     // Getters and Setters
+
+    public Long getGoalId() { return goalId; }
+
+    public void setGoalId(Long goalId) { this.goalId = goalId; }
+
     public Double getAmount() {
         return amount;
     }

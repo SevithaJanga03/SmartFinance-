@@ -1,0 +1,173 @@
+/* Container for the goals page */
+.goals-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #f1f5f9;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Page heading */
+.goals-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+/* Form for creating new goals */
+.goal-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.goal-form input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #1f2937;
+    color: #cbd5e1;
+}
+
+.goal-form input:focus {
+    border-color: #22d3ee;
+    outline: none;
+}
+
+.goal-form button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.goal-form button:hover {
+    background: #1e40af;
+}
+
+/* Grid layout for goals */
+.goal-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+/* Goal card */
+.goal-card {
+    max-width: 600px;
+    background: #1f2937;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.3s, transform 0.3s;
+    margin: auto;
+}
+
+.goal-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+}
+
+/* Goal details */
+.goal-details {
+    flex: 1;
+}
+
+.goal-details h3 {
+    font-size: 1.4rem;
+    color: #f1f5f9;
+    margin-bottom: 10px;
+}
+
+.goal-details p {
+    margin: 4px 0;
+    color: #9ca3af;
+    font-size: 0.95rem;
+}
+
+/* Input and delete button container */
+.update-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.update-container input[type="number"] {
+    width: 120px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
+.update-container input[type="number"]:focus {
+    border-color: #22d3ee;
+    outline: none;
+}
+
+.update-container .delete-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.update-container .delete-btn:hover {
+    background: #b91c1c;
+}
+
+/* Circular progress bar container */
+.circular-progress-container {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+.update-container {
+    display: flex;
+    flex-wrap: wrap; /* allows wrapping on small screens */
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.update-container input[type="number"] {
+    flex: 1 1 auto; /* allows it to take available space */
+    min-width: 100px;
+    max-width: 120px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
+.update-container input[type="number"]:focus {
+    border-color: #22d3ee;
+    outline: none;
+}
+
+.update-container .delete-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0; /* prevents it from shrinking too small */
+}
+
+.update-container .delete-btn:hover {
+    background: #b91c1c;
+}

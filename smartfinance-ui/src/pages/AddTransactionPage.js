@@ -5,28 +5,29 @@ import "../styles/Styles.css";
 const AddTransactionPage = () => {
     const [type, setType] = useState("INCOME");
     const [accounts, setAccounts] = useState([]);
+    const [goals, setGoals] = useState([]);
+    const [message, setMessage] = useState("");
+    const [goalError, setGoalError] = useState(""); // Error for no goals
+
     const [formData, setFormData] = useState({
         amount: "",
         category: "",
         description: "",
         date: "",
-        accountId: "" // ➡️ New field for selected account
+        accountId: "",
+        goalId: "" // New field to hold selected goal
     });
-    const [message, setMessage] = useState("");
 
-    // ➡️ Fetch accounts when the component mounts
+    const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+    // Fetch accounts
     useEffect(() => {
+        if (!token) return;
+
         const fetchAccounts = async () => {
-            const user = JSON.parse(localStorage.getItem("user"));
-            const token = user?.token;
-
-            if (!token) return;
-
             try {
                 const res = await axios.get("http://localhost:8080/api/accounts", {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 setAccounts(res.data);
             } catch (err) {
@@ -35,7 +36,33 @@ const AddTransactionPage = () => {
         };
 
         fetchAccounts();
-    }, []);
+    }, [token]);
+
+    // Fetch goals only if category is "Goals"
+    useEffect(() => {
+        if (formData.category === "Goals") {
+            const fetchGoals = async () => {
+                try {
+                    const res = await axios.get("http://localhost:8080/api/goals", {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.data.length === 0) {
+                        setGoalError("❌ No goals found. Please add a goal first.");
+                    } else {
+                        setGoalError("");
+                        setGoals(res.data);
+                    }
+                } catch (err) {
+                    console.error("Error fetching goals:", err);
+                }
+            };
+            fetchGoals();
+        } else {
+            // Clear goal selection if user changes category
+            setFormData((prev) => ({ ...prev, goalId: "" }));
+            setGoalError("");
+        }
+    }, [formData.category, token]);
 
     const handleChange = (e) => {
         setFormData({
@@ -46,8 +73,6 @@ const AddTransactionPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = user?.token;
 
         if (!token) {
             setMessage("User not authenticated");
@@ -59,20 +84,25 @@ const AddTransactionPage = () => {
             return;
         }
 
+        if (formData.category === "Goals" && !formData.goalId) {
+            setMessage("Please select a goal for this transaction");
+            return;
+        }
+
         try {
             const payload = { ...formData, type };
             await axios.post("http://localhost:8080/api/transactions", payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
+
             setMessage("✅ Transaction added successfully!");
             setFormData({
                 amount: "",
                 category: "",
                 description: "",
                 date: "",
-                accountId: ""
+                accountId: "",
+                goalId: ""
             });
         } catch (err) {
             console.error("Error adding transaction:", err);
@@ -82,7 +112,7 @@ const AddTransactionPage = () => {
 
     const setTypeAndReset = (newType) => {
         setType(newType);
-        setFormData((prev) => ({ ...prev, category: "" }));
+        setFormData((prev) => ({ ...prev, category: "", goalId: "" }));
     };
 
     return (
@@ -107,7 +137,6 @@ const AddTransactionPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="transaction-form">
-                {/* ➡️ Account select */}
                 <select
                     name="accountId"
                     value={formData.accountId}
@@ -129,7 +158,6 @@ const AddTransactionPage = () => {
                     min="0"
                     value={formData.amount}
                     onChange={handleChange}
-                    className="amount-input"
                     onWheel={(e) => e.target.blur()}
                     required
                 />
@@ -147,6 +175,7 @@ const AddTransactionPage = () => {
                             <option value="Freelance">Freelance</option>
                             <option value="Investments">Investments</option>
                             <option value="Gift">Gift</option>
+                            <option value="Goals">Goals</option>
                             <option value="Other Income">Other Income</option>
                         </>
                     ) : (
@@ -162,6 +191,32 @@ const AddTransactionPage = () => {
                         </>
                     )}
                 </select>
+
+                {/* Show goal dropdown if category is Goals */}
+                {formData.category === "Goals" && (
+                    <>
+                        {goals.length > 0 ? (
+                            <select
+                                name="goalId"
+                                value={formData.goalId}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Select Goal</option>
+                                {goals.map((goal) => (
+                                    <option key={goal.id} value={goal.id}>
+                                        {goal.name} (Target: ${goal.targetAmount})
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <p className="form-message error" style={{ marginTop: "8px" }}>
+                                ❌ No goals found. Please add a goal first.
+                            </p>
+                        )}
+                    </>
+                )}
+
 
                 <input
                     type="text"

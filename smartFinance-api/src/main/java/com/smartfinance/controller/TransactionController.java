@@ -2,9 +2,11 @@ package com.smartfinance.controller;
 
 import com.smartfinance.dto.TransactionDTO;
 import com.smartfinance.model.Account;
+import com.smartfinance.model.Goal;
 import com.smartfinance.model.Transaction;
 import com.smartfinance.model.User;
 import com.smartfinance.repository.AccountRepository;
+import com.smartfinance.repository.GoalRepository;
 import com.smartfinance.repository.TransactionRepository;
 import com.smartfinance.repository.UserRepository;
 import com.smartfinance.security.JwtUtil;
@@ -14,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDate;   // ✅ Import LocalDate
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,6 +34,9 @@ public class TransactionController {
     private AccountRepository accountRepository;
 
     @Autowired
+    private GoalRepository goalRepository;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping
@@ -44,18 +49,30 @@ public class TransactionController {
         Account account = accountRepository.findById(dto.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        // Convert String date to LocalDate
-        LocalDate parsedDate = LocalDate.parse(dto.getDate());  // ✅ Fix
+        LocalDate parsedDate = LocalDate.parse(dto.getDate());
 
-        // Create and save transaction
         Transaction transaction = new Transaction();
         transaction.setAmount(dto.getAmount());
         transaction.setCategory(dto.getCategory());
         transaction.setDescription(dto.getDescription());
-        transaction.setDate(parsedDate);  // ✅ Use LocalDate
+        transaction.setDate(parsedDate);
         transaction.setType(dto.getType());
         transaction.setUser(user);
         transaction.setAccount(account);
+
+        // ➡️ If linked to a goal
+        if (dto.getGoalId() != null) {
+            Goal goal = goalRepository.findById(dto.getGoalId())
+                    .orElseThrow(() -> new RuntimeException("Goal not found"));
+
+            // Update goal’s current amount
+            double updatedAmount = goal.getCurrentAmount() + dto.getAmount();
+            goal.setCurrentAmount(updatedAmount);
+            goalRepository.save(goal);
+
+            // Link transaction to goal
+            transaction.setGoal(goal);
+        }
 
         transactionRepository.save(transaction);
 
@@ -76,10 +93,12 @@ public class TransactionController {
             dto.setAmount(t.getAmount());
             dto.setCategory(t.getCategory());
             dto.setDescription(t.getDescription());
-            dto.setDate(t.getDate().toString());   // ✅ Send as String
+            dto.setDate(t.getDate().toString());
             dto.setType(t.getType());
             dto.setAccountId(t.getAccount() != null ? t.getAccount().getId() : null);
             dto.setAccountName(t.getAccount() != null ? t.getAccount().getName() : "");
+            // Also include goalId if present
+            dto.setGoalId(t.getGoal() != null ? t.getGoal().getId() : null);
             return dto;
         }).toList();
 
@@ -98,6 +117,13 @@ public class TransactionController {
 
         if (!transaction.getUser().getId().equals(user.getId())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete this transaction.");
+        }
+
+        // ➡️ If linked to a goal, update the goal's current amount
+        if (transaction.getGoal() != null) {
+            Goal goal = transaction.getGoal();
+            goal.setCurrentAmount(goal.getCurrentAmount() - transaction.getAmount());
+            goalRepository.save(goal);
         }
 
         transactionRepository.delete(transaction);
@@ -119,20 +145,35 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update this transaction.");
         }
 
-        if (dto.getAccountId() != null) {
-            Account account = accountRepository.findById(dto.getAccountId())
-                    .orElseThrow(() -> new RuntimeException("Account not found"));
-            transaction.setAccount(account);
-        }
+        Account account = accountRepository.findById(dto.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        // Convert String date to LocalDate
-        LocalDate parsedDate = LocalDate.parse(dto.getDate());  // ✅ Fix
+        LocalDate parsedDate = LocalDate.parse(dto.getDate());
+
+        // ➡️ If previously linked to a goal, subtract old amount
+        if (transaction.getGoal() != null) {
+            Goal oldGoal = transaction.getGoal();
+            oldGoal.setCurrentAmount(oldGoal.getCurrentAmount() - transaction.getAmount());
+            goalRepository.save(oldGoal);
+        }
 
         transaction.setAmount(dto.getAmount());
         transaction.setCategory(dto.getCategory());
         transaction.setDescription(dto.getDescription());
-        transaction.setDate(parsedDate);   // ✅ Use LocalDate
+        transaction.setDate(parsedDate);
         transaction.setType(dto.getType());
+        transaction.setAccount(account);
+
+        // ➡️ If linked to a new goal
+        if (dto.getGoalId() != null) {
+            Goal newGoal = goalRepository.findById(dto.getGoalId())
+                    .orElseThrow(() -> new RuntimeException("Goal not found"));
+            newGoal.setCurrentAmount(newGoal.getCurrentAmount() + dto.getAmount());
+            goalRepository.save(newGoal);
+            transaction.setGoal(newGoal);
+        } else {
+            transaction.setGoal(null); // Remove goal link if none provided
+        }
 
         transactionRepository.save(transaction);
         return ResponseEntity.ok("Transaction updated successfully!");

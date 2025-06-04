@@ -779,6 +779,11 @@ html, body {
     overflow-x: auto;
 }
 
+.form-message.error {
+    color: #f87171; /* bright red for clarity */
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
 
 
 

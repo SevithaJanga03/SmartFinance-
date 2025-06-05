@@ -105,31 +105,6 @@ public class TransactionController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTransaction(@PathVariable Long id,
-                                               @RequestHeader("Authorization") String authHeader) {
-        String username = jwtUtil.extractUsername(authHeader.substring(7));
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-        if (!transaction.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete this transaction.");
-        }
-
-        // ➡️ If linked to a goal, update the goal's current amount
-        if (transaction.getGoal() != null) {
-            Goal goal = transaction.getGoal();
-            goal.setCurrentAmount(goal.getCurrentAmount() - transaction.getAmount());
-            goalRepository.save(goal);
-        }
-
-        transactionRepository.delete(transaction);
-        return ResponseEntity.ok("Transaction deleted successfully!");
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTransaction(@PathVariable Long id,
                                                @RequestBody TransactionDTO dto,
@@ -150,13 +125,29 @@ public class TransactionController {
 
         LocalDate parsedDate = LocalDate.parse(dto.getDate());
 
-        // ➡️ If previously linked to a goal, subtract old amount
-        if (transaction.getGoal() != null) {
-            Goal oldGoal = transaction.getGoal();
-            oldGoal.setCurrentAmount(oldGoal.getCurrentAmount() - transaction.getAmount());
-            goalRepository.save(oldGoal);
+        // Fetch the linked goal from DB
+        Goal linkedGoal = transaction.getGoal();
+
+        boolean categoryChanged = !dto.getCategory().equalsIgnoreCase(transaction.getCategory());
+        boolean amountChanged = !dto.getAmount().equals(transaction.getAmount());
+
+        if (linkedGoal != null) {
+            // If category changed and it's no longer a goal category
+            if (categoryChanged && !dto.getCategory().equalsIgnoreCase("Goal")) {
+                // Remove goal link and subtract transaction amount from goal
+                linkedGoal.setCurrentAmount(linkedGoal.getCurrentAmount() - transaction.getAmount());
+                goalRepository.save(linkedGoal);
+                transaction.setGoal(null);
+            }
+            // If amount changed and still in goal category
+            else if (amountChanged && dto.getCategory().equalsIgnoreCase("Goal")) {
+                double difference = dto.getAmount() - transaction.getAmount();
+                linkedGoal.setCurrentAmount(linkedGoal.getCurrentAmount() + difference);
+                goalRepository.save(linkedGoal);
+            }
         }
 
+        // Update transaction fields
         transaction.setAmount(dto.getAmount());
         transaction.setCategory(dto.getCategory());
         transaction.setDescription(dto.getDescription());
@@ -164,19 +155,34 @@ public class TransactionController {
         transaction.setType(dto.getType());
         transaction.setAccount(account);
 
-        // ➡️ If linked to a new goal
-        if (dto.getGoalId() != null) {
-            Goal newGoal = goalRepository.findById(dto.getGoalId())
-                    .orElseThrow(() -> new RuntimeException("Goal not found"));
-            newGoal.setCurrentAmount(newGoal.getCurrentAmount() + dto.getAmount());
-            goalRepository.save(newGoal);
-            transaction.setGoal(newGoal);
-        } else {
-            transaction.setGoal(null); // Remove goal link if none provided
-        }
-
         transactionRepository.save(transaction);
         return ResponseEntity.ok("Transaction updated successfully!");
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTransaction(@PathVariable Long id,
+                                               @RequestHeader("Authorization") String authHeader) {
+        String username = jwtUtil.extractUsername(authHeader.substring(7));
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to delete this transaction.");
+        }
+
+        // If linked to a goal, subtract the amount from the goal's currentAmount
+        if (transaction.getGoal() != null) {
+            Goal goal = transaction.getGoal();
+            goal.setCurrentAmount(goal.getCurrentAmount() - transaction.getAmount());
+            goalRepository.save(goal);
+        }
+
+        transactionRepository.delete(transaction);
+        return ResponseEntity.ok("Transaction deleted successfully!");
     }
 
     @GetMapping("/categories")

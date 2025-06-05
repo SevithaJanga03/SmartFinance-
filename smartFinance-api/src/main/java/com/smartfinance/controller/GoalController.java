@@ -1,5 +1,6 @@
 package com.smartfinance.controller;
 
+import com.smartfinance.dto.GoalSummaryDTO;
 import com.smartfinance.model.Goal;
 import com.smartfinance.model.User;
 import com.smartfinance.repository.UserRepository;
@@ -39,8 +40,15 @@ public class GoalController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGoal(@PathVariable Long id, Principal principal) {
+    public String deleteGoal(@PathVariable Long id, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).orElseThrow();
-        goalService.deleteGoal(user, id);
+        return goalService.deleteGoal(user, id);
+    }
+
+    // ✅ New summary endpoint!
+    @GetMapping("/summary")
+    public List<GoalSummaryDTO> getGoalSummaries(Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow();
+        return goalService.getGoalSummaries(user);
     }
 }

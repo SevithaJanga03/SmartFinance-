@@ -5,7 +5,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const GoalsPage = () => {
-    const [goals, setGoals] = useState([]);
+    const [goalSummaries, setGoalSummaries] = useState([]);
     const [newGoal, setNewGoal] = useState({
         name: "",
         targetAmount: "",
@@ -15,11 +15,16 @@ const GoalsPage = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const token = storedUser?.token;
 
-    const fetchGoals = async () => {
-        const res = await axios.get("http://localhost:8080/api/goals", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        setGoals(res.data);
+    const fetchGoalSummaries = async () => {
+        if (!token) return;
+        try {
+            const res = await axios.get("http://localhost:8080/api/goals/summary", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setGoalSummaries(res.data);
+        } catch (err) {
+            console.error("Error fetching goal summaries:", err);
+        }
     };
 
     const createGoal = async () => {
@@ -28,44 +33,58 @@ const GoalsPage = () => {
             return;
         }
 
-        await axios.post(
-            "http://localhost:8080/api/goals",
-            {
-                name: newGoal.name,
-                targetAmount: parseFloat(newGoal.targetAmount),
-                targetDate: newGoal.targetDate,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setNewGoal({ name: "", targetAmount: "", targetDate: "" });
-        fetchGoals();
+        try {
+            await axios.post(
+                "http://localhost:8080/api/goals",
+                {
+                    name: newGoal.name,
+                    targetAmount: parseFloat(newGoal.targetAmount),
+                    targetDate: newGoal.targetDate,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setNewGoal({ name: "", targetAmount: "", targetDate: "" });
+            fetchGoalSummaries();
+        } catch (err) {
+            console.error("Error creating goal:", err);
+            alert("Create failed!");
+        }
     };
 
-    const updateGoal = async (id, updatedAmount) => {
-        if (!updatedAmount || parseFloat(updatedAmount) <= 0) return;
-        await axios.put(
-            `http://localhost:8080/api/goals/${id}`,
-            { currentAmount: parseFloat(updatedAmount) },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        fetchGoals();
-    };
-
-    const deleteGoal = async (id) => {
-        await axios.delete(`http://localhost:8080/api/goals/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        fetchGoals();
+    const deleteGoal = async (goalId) => {
+        try {
+            const res = await axios.delete(
+                `http://localhost:8080/api/goals/${goalId}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const message = res.data;
+            if (message.includes("Cannot delete goal")) {
+                alert(message);
+            } else {
+                alert("Goal deleted!");
+                fetchGoalSummaries();
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 403) {
+                alert("You cannot delete this goal because it has linked transactions.");
+            } else {
+                console.error("Error deleting goal:", err);
+                alert("Delete failed!");
+            }
+        }
     };
 
     useEffect(() => {
-        fetchGoals();
+        fetchGoalSummaries();
     }, []);
 
     return (
         <div className="goals-container">
             <h1>Your Financial Goals</h1>
 
+            {/* Create New Goal Form */}
             <div className="goal-form">
                 <input
                     type="text"
@@ -91,28 +110,27 @@ const GoalsPage = () => {
                 <button onClick={createGoal}>Create Goal</button>
             </div>
 
+            {/* Goal Cards */}
             <div className="goal-list">
-                {goals.map((goal) => {
+                {goalSummaries.map((goal) => {
                     const progress = Math.min(
-                        (goal.currentAmount / goal.targetAmount) * 100,
+                        (goal.usedAmount / goal.targetAmount) * 100,
                         100
                     );
 
                     return (
-                        <div key={goal.id} className="goal-card">
+                        <div key={goal.goalId} className="goal-card">
                             <div className="goal-details">
-                                <h3>{goal.name}</h3>
-                                <p>Target: ${goal.targetAmount}</p>
-                                <p>Current: ${goal.currentAmount}</p>
-                                <p>Target Date: {goal.targetDate}</p>
-                                <div className="update-container">
-                                    <button
-                                        onClick={() => deleteGoal(goal.id)}
-                                        className="delete-btn"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
+                                <h3>{goal.goalName}</h3>
+                                <p>Target Amount: ${goal.targetAmount}</p>
+                                <p>Progress: ${goal.usedAmount}</p>
+                                <p>Remaining: ${goal.leftAmount}</p>
+                                <button
+                                    onClick={() => deleteGoal(goal.goalId)}
+                                    className="delete-btn"
+                                >
+                                    Delete
+                                </button>
                             </div>
 
                             <div className="circular-progress-container">
@@ -121,10 +139,14 @@ const GoalsPage = () => {
                                     text={`${progress.toFixed(0)}%`}
                                     styles={buildStyles({
                                         pathTransition: "stroke-dashoffset 1.5s ease 0s",
-                                        textColor: "#22d3ee",
-                                        pathColor: "#22d3ee",
+                                        textColor: "#0ea5e9",
+                                        pathColor: "#0ea5e9",
                                         trailColor: "#334155",
+                                        pathTransitionDuration: 0.5,
+                                        // Thicker path:
+                                        strokeLinecap: "butt",
                                     })}
+                                    strokeWidth={10} // Thicker progress bar
                                 />
                             </div>
                         </div>

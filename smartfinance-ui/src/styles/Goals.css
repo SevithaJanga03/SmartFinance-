@@ -2,7 +2,7 @@
 .goals-container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 2rem;
     color: #f1f5f9;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -11,20 +11,20 @@
 .goals-container h1 {
     text-align: center;
     font-size: 2rem;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
 }
 
 /* Form for creating new goals */
 .goal-form {
     display: flex;
-    gap: 10px;
-    margin-bottom: 40px;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .goal-form input {
     flex: 1;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 0.5rem;
+    border-radius: 0.4rem;
     border: 1px solid #334155;
     background: #1f2937;
     color: #cbd5e1;
@@ -39,8 +39,8 @@
     background: #2563eb;
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 10px 16px;
+    border-radius: 0.4rem;
+    padding: 0.5rem 1rem;
     cursor: pointer;
     transition: background 0.3s;
 }
@@ -51,123 +51,87 @@
 
 /* Grid layout for goals */
 .goal-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 /* Goal card */
 .goal-card {
-    max-width: 600px;
-    background: #1f2937;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    padding: 20px;
+    background: #1e293b;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 1rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* details on left, progress bar on right */
     align-items: center;
+    width: 300px; /* fixed width for uniform look */
     transition: box-shadow 0.3s, transform 0.3s;
-    margin: auto;
 }
 
 .goal-card:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
     transform: translateY(-4px);
 }
 
 /* Goal details */
 .goal-details {
     flex: 1;
+    text-align: left;
 }
 
 .goal-details h3 {
-    font-size: 1.4rem;
-    color: #f1f5f9;
-    margin-bottom: 10px;
+    margin-bottom: 0.5rem;
+    color: #e0f2fe;
+    font-size: 1.2rem;
 }
 
 .goal-details p {
-    margin: 4px 0;
-    color: #9ca3af;
-    font-size: 0.95rem;
-}
-
-/* Input and delete button container */
-.update-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.update-container input[type="number"] {
-    width: 120px;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #334155;
-    background: #1e293b;
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
     color: #cbd5e1;
 }
 
-.update-container input[type="number"]:focus {
-    border-color: #22d3ee;
-    outline: none;
-}
-
-.update-container .delete-btn {
+/* Delete button */
+.delete-btn {
     background: #ef4444;
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    margin-top: 0.6rem;
     cursor: pointer;
     transition: background 0.3s;
 }
 
-.update-container .delete-btn:hover {
+.delete-btn:hover {
     background: #b91c1c;
 }
 
 /* Circular progress bar container */
 .circular-progress-container {
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
     flex-shrink: 0;
-    margin-left: 20px;
-}
-.update-container {
-    display: flex;
-    flex-wrap: wrap; /* allows wrapping on small screens */
-    gap: 8px;
-    margin-top: 10px;
+    margin-left: 1rem;
 }
 
-.update-container input[type="number"] {
-    flex: 1 1 auto; /* allows it to take available space */
-    min-width: 100px;
-    max-width: 120px;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #334155;
-    background: #1e293b;
-    color: #cbd5e1;
+/* Thicker progress bar paths */
+.CircularProgressbar-path {
+    stroke-width: 10px !important;
 }
 
-.update-container input[type="number"]:focus {
-    border-color: #22d3ee;
-    outline: none;
+.CircularProgressbar-trail {
+    stroke-width: 10px !important;
 }
 
-.update-container .delete-btn {
-    background: #ef4444;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background 0.3s;
-    flex-shrink: 0; /* prevents it from shrinking too small */
-}
+/* Responsive: stack form inputs on small screens */
+@media (max-width: 500px) {
+    .goal-form {
+        flex-direction: column;
+    }
 
-.update-container .delete-btn:hover {
-    background: #b91c1c;
+    .goal-card {
+        width: 100%;
+    }
 }

@@ -22,7 +22,6 @@ const AppLayout = () => {
                     <NavLink to="/accounts" className="sidebar-link">Accounts</NavLink>
                     <NavLink to="/budgets" className="sidebar-link">Budgets</NavLink>
                     <NavLink to="/goals" className="sidebar-link">Goals</NavLink>
-                    <NavLink to="/debts" className="sidebar-link">Debts</NavLink>
                     <NavLink to="/reports" className="sidebar-link">Reports</NavLink>
                     <NavLink to="/add-transaction" className="sidebar-link add-button-link">+ Add</NavLink>
                 </nav>

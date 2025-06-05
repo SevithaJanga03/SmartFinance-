@@ -1,5 +1,6 @@
 package com.smartfinance.repository;
 
+import com.smartfinance.model.Goal;
 import com.smartfinance.model.Transaction;
 import com.smartfinance.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,10 @@ import java.util.Map;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByUser(User user);
+
+    List<Transaction> findByGoal(Goal goal);
+
+    long countByGoal(Goal goal);
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user = :user AND t.type = 'INCOME'")
     Double getTotalIncome(User user);
@@ -83,6 +88,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         @Query("SELECT t FROM Transaction t WHERE t.user = :user AND t.type = :type AND FUNCTION('DATE_FORMAT', t.date, '%Y-%m') = :month")
     List<Transaction> findByUserAndTypeAndMonth(@Param("user") User user, @Param("type") String type, @Param("month") String month);
 
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.goal.id = :goalId AND t.user = :user")
+    Double sumExpensesForGoal(@Param("goalId") Long goalId, @Param("user") User user);
 
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.goal.id = :goalId AND t.user = :user AND t.date <= :targetDate")
+    Double sumExpensesForGoalWithinDate(@Param("goalId") Long goalId, @Param("user") User user, @Param("targetDate") LocalDate targetDate);
 
 }
